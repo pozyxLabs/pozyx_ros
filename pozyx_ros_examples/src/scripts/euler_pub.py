@@ -8,9 +8,7 @@ getAllSensorData.
 
 import pypozyx
 import rospy
-from serial.tools.list_ports import comports
-
-from msg import EulerAngles
+from pozyx_ros_examples.msg import EulerAngles
 
 remote_id = None
 
@@ -19,13 +17,14 @@ def pozyx_euler_pub():
     pub = rospy.Publisher('pozyx_euler_angles', EulerAngles, queue_size=100)
     rospy.init_node('pozyx_euler_pub')
     try:
-        pozyx = pypozyx.PozyxSerial(str(comports()[0]).split(' ')[0])
+        pozyx = pypozyx.PozyxSerial(pypozyx.get_serial_ports()[0].device)
     except:
         rospy.loginfo("Pozyx not connected")
         return
     while not rospy.is_shutdown():
         euler_angles = pypozyx.EulerAngles()
         pozyx.getEulerAngles_deg(euler_angles, remote_id=remote_id)
+        rospy.loginfo(euler_angles)
         pub.publish(euler_angles.heading,
                     euler_angles.roll, euler_angles.pitch)
 

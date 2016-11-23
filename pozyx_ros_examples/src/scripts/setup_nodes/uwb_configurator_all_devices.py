@@ -11,10 +11,8 @@ starting the other nodes is valid.
 PS: Don't forget the anchor configuration.
 """
 
-import rospy
 import pypozyx
-
-from serial.tools.list_ports import comports
+import rospy
 
 new_uwb_settings = pypozyx.UWBSettings(
     channel=2, bitrate=2, prf=2, plen=0x04, gain_db=15.0)
@@ -29,7 +27,7 @@ def set_same_uwb_settings():
     rospy.loginfo("Setting all encountered devices to UWB settings: %s" %
                   str(new_uwb_settings))
     try:
-        pozyx = pypozyx.PozyxSerial(str(comports()[0]).split(' ')[0])
+        pozyx = pypozyx.PozyxSerial(pypozyx.get_serial_ports()[0].device)
     except:
         rospy.loginfo("Pozyx not connected")
         return

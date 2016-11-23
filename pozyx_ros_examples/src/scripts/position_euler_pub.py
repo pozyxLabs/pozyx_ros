@@ -9,7 +9,6 @@ import pypozyx
 import rospy
 from geometry_msgs.msg import Point32
 from pozyx_ros_examples.msg import EulerAngles
-from serial.tools.list_ports import comports
 
 remote_id = None
 
@@ -21,7 +20,7 @@ def pozyx_position_euler_pub():
         'pozyx_euler_angles', EulerAngles, queue_size=100)
     rospy.init_node('position_euler_pub')
     try:
-        pozyx = pypozyx.PozyxSerial(str(comports()[0]).split(' ')[0])
+        pozyx = pypozyx.PozyxSerial(pypozyx.get_serial_ports()[0].device)
     except:
         rospy.loginfo("Pozyx not connected")
         return
@@ -31,6 +30,7 @@ def pozyx_position_euler_pub():
         pub.publish(coords.x, coords.y, coords.z)
         euler_angles = pypozyx.EulerAngles()
         pozyx.getEulerAngles_deg(euler_angles)
+        rospy.loginfo("POS: %s, ANGLES: %s" % (str(coords), str(euler_angles)))
         pub.publish(euler_angles.heading,
                     euler_angles.roll, euler_angles.pitch)
 

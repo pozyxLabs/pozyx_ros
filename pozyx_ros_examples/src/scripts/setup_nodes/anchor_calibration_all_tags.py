@@ -9,7 +9,6 @@ recommend to run the uwb_configurator node first.
 
 import pypozyx
 import rospy
-from serial.tools.list_ports import comports
 
 anchors = [pypozyx.DeviceCoordinates(0x0001, 1, pypozyx.Coordinates(0, 0, 5000)),
            pypozyx.DeviceCoordinates(0x0002, 1, pypozyx.Coordinates(5000, 0, 1000)),
@@ -24,11 +23,11 @@ def set_anchor_configuration():
 
     settings_registers = [0x16, 0x17]  # POS ALG and NUM ANCHORS
     try:
-        pozyx = pypozyx.PozyxSerial(str(comports()[0]).split(' ')[0])
+        pozyx = pypozyx.PozyxSerial(pypozyx.get_serial_ports()[0].device)
     except:
         rospy.loginfo("Pozyx not connected")
         return
-    pozyx.doDiscovery(discovery_type=POZYX_DISCOVERY_TAGS_ONLY)
+    pozyx.doDiscovery(discovery_type=pypozyx.POZYX_DISCOVERY_TAGS_ONLY)
     device_list_size = pypozyx.SingleRegister()
     pozyx.getDeviceListSize(device_list_size)
     if device_list_size[0] > 0:
@@ -40,7 +39,7 @@ def set_anchor_configuration():
         for anchor in anchors:
             pozyx.addDevice(anchor, tag)
         if len(anchors) > 4:
-            pozyx.setSelectionOfAnchors(POZYX_ANCHOR_SEL_AUTO,
+            pozyx.setSelectionOfAnchors(pypozyx.POZYX_ANCHOR_SEL_AUTO,
                                         len(anchors), remote_id=tag)
             pozyx.saveRegisters(settings_registers, remote_id=tag)
         pozyx.saveNetwork(remote_id=tag)
