@@ -16,7 +16,7 @@ remote_id = None
 def pozyx_position_euler_pub():
     position_pub = rospy.Publisher(
         'pozyx_positioning', Point32, queue_size=100)
-    euler_pub = rospy.Publisger(
+    euler_pub = rospy.Publisher(
         'pozyx_euler_angles', EulerAngles, queue_size=100)
     rospy.init_node('position_euler_pub')
     try:
